@@ -1,8 +1,8 @@
-.board{ 
+.board {
     display: flex;
     flex-direction: column;
 }
 
-.row{
+.row {
     display: flex;
 }

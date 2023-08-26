@@ -1,23 +1,23 @@
-import React from 'react'
 import './Square.css';
-import classnames from 'classnames';
+import classNames from 'classnames';
 
-const Square = ({value, onClick, turn, winner}) => {
-    const handleClick = () =>{
+const Square = ({ value, onClick, turn, winner }) => {
+
+    const handleClick = () => {
         (turn !== null && value === null) && onClick();
     }
 
-    let squareClass = classnames({
-        square: true, 
+    let squareClass = classNames({
+        square: true,
         [`square--${value}`]: value !== null,
         winner: winner,
     });
 
-  return (
-    <div className={squareClass} onClick={() => handleClick()}>
-      
-    </div>
-  )
+    return (
+        <div className={squareClass} onClick={() => handleClick()}>
+
+        </div>
+    )
 }
 
-export default Square
+export default Square;

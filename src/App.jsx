@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import Board from './components/Board/Board';
-import Square from './components/Square/Square';
 import ScoreBoard from './components/ScoreBoard/ScoreBoard';
+import PlayerInfo from './components/PlayerInfo/PlayerInfo';
 
 const winningPositions = [
   [0, 1, 2],
@@ -12,7 +12,7 @@ const winningPositions = [
   [1, 4, 7],
   [2, 5, 8],
   [0, 4, 8],
-  [2, 4, 6]
+  [2, 4, 6],
 ];
 
 const App = () => {
@@ -21,38 +21,46 @@ const App = () => {
   const [winningSquares, setWinningSquares] = useState([]);
   const [score, setScore] = useState({
     X: 0,
-    O: 0
+    O: 0,
   });
-  const [playerXName, setPlayerXName] = useState('');
-  const [playerOName, setPlayerOName] = useState('');
+  const [player1Name, setPlayer1Name] = useState('');
+  const [player2Name, setPlayer2Name] = useState('');
+  const [player1Symbol, setPlayer1Symbol] = useState('');
+  const [player2Symbol, setPlayer2Symbol] = useState('');
+  const [roundWinner, setRoundWinner] = useState('');
+  const [playerInfoEntered, setPlayerInfoEntered] = useState(false);
+  const [lastRoundWinner, setLastRoundWinner] = useState('');
+
+  useEffect(() => {
+    if (roundWinner !== '') {
+      setLastRoundWinner(roundWinner);
+      setRoundWinner('');
+    }
+  }, [roundWinner]);
 
   const reset = () => {
+    setTurn('X');
     setSquares(Array(9).fill(null));
-    setTurn(null);
     setWinningSquares([]);
   };
 
-  const checkForWinner = newSquares => {
+  const checkForWinner = (newSquares) => {
     for (let i = 0; i < winningPositions.length; i++) {
       const [a, b, c] = winningPositions[i];
-      if (
-        newSquares[a] &&
-        newSquares[a] === newSquares[b] &&
-        newSquares[a] === newSquares[c]
-      ) {
+      if (newSquares[a] && newSquares[a] === newSquares[b] && newSquares[a] === newSquares[c]) {
         endGame(newSquares[a], winningPositions[i]);
         return;
       }
     }
+
     if (!newSquares.includes(null)) {
       endGame(null, Array.from(Array(10).keys()));
       return;
     }
-
     setTurn(turn === 'X' ? 'O' : 'X');
   };
 
-  const handleClick = square => {
+  const handleClick = (square) => {
     if (turn === null) {
       return;
     }
@@ -62,75 +70,61 @@ const App = () => {
     checkForWinner(newSquares);
   };
 
-  const handleStartClick = selectedTurn => {
-    setTurn(selectedTurn);
-  };
-
-  const handlePlayerXNameChange = event => {
-    setPlayerXName(event.target.value);
-  };
-
-  const handlePlayerONameChange = event => {
-    setPlayerOName(event.target.value);
-  };
-
   const endGame = (result, winningPositions) => {
     setTurn(null);
     if (result !== null) {
       setScore({
         ...score,
-        [result]: score[result] + 1
+        [result]: score[result] + 1,
       });
     }
-
     setWinningSquares(winningPositions);
+    setRoundWinner(result === null ? 'Draw' : result === player1Symbol ? player1Name : player2Name);
     setTimeout(reset, 2000);
   };
 
+  const handlePlayerInfoChange = (name1, name2, symbol) => {
+    setPlayer1Name(name1);
+    setPlayer2Name(name2);
+
+    if (symbol === 'X') {
+      setPlayer1Symbol('X');
+      setPlayer2Symbol('O');
+    } else {
+      setPlayer1Symbol('O');
+      setPlayer2Symbol('X');
+    }
+
+    setPlayerInfoEntered(true);
+
+    if (turn === null) {
+      setTurn('X');
+    }
+  };
+
   return (
-    <>
-      <div className="container">
-        {turn === null ? (
+    <div className="container">
+      <h1>{playerInfoEntered ? (lastRoundWinner !== '' ? `Last Round winner: ${lastRoundWinner}` : "Who's gonna win?") : 'Choose your weapon'}</h1>
+      {!playerInfoEntered && (
+        <PlayerInfo onChange={handlePlayerInfoChange} />
+      )}
+      {playerInfoEntered && turn !== null && (
+        <>
           <div>
-            <label>
-              Player X Name:
-              <input
-                type="text"
-                value={playerXName}
-                onChange={handlePlayerXNameChange}
-              />
-            </label>
-            <br />
-            <label>
-              Player O Name:
-              <input
-                type="text"
-                value={playerOName}
-                onChange={handlePlayerONameChange}
-              />
-            </label>
-            <br />
-            <button onClick={() => handleStartClick('X')}>Start as X</button>
-            <button onClick={() => handleStartClick('O')}>Start as O</button>
+            <span>{player1Name} ({player1Symbol})</span>
+            <span> vs </span>
+            <span>{player2Name} ({player2Symbol})</span>
           </div>
-        ) : (
-          <>
-            <Board
-              winningSquares={winningSquares}
-              turn={turn}
-              squares={squares}
-              onClick={handleClick}
-            />
-            <ScoreBoard
-              scoreO={score.O}
-              scoreX={score.X}
-              playerOName={playerOName}
-              playerXName={playerXName}
-            />
-          </>
-        )}
-      </div>
-    </>
+          <Board
+            winningSquares={winningSquares}
+            turn={turn}
+            squares={squares}
+            onClick={handleClick}
+          />
+          <ScoreBoard scoreO={score.O} scoreX={score.X} />
+        </>
+      )}
+    </div>
   );
 };
 

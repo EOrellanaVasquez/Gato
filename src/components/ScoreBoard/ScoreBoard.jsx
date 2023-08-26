@@ -1,17 +1,10 @@
-import React from 'react';
 import './ScoreBoard.css';
 
-const ScoreBoard = ({ scoreO, scoreX, playerOName, playerXName }) => {
-  return (
+const ScoreBoard = ({scoreX, scoreO}) => (
     <div className="score-board">
-      <div>
-        {playerOName}: {scoreO}
-      </div>
-      <div>
-        {playerXName}: {scoreX}
-      </div>
+        <div>{scoreX}</div>
+        <div>{scoreO}</div>
     </div>
-  );
-};
+)
 
 export default ScoreBoard;

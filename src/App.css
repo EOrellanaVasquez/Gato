@@ -1,9 +1,17 @@
-.container{
+.container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
     background-color: #22333B;
-}
-
+  }
+  
+  span{
+    margin: 0 5px;
+    padding: 5px 10px;
+    font-size: 2em;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+  }
